@@ -1,0 +1,56 @@
+<?php namespace ProcessWire;
+
+/**
+ * @author  Leftfield
+ * @website https://vujosevic.com
+ * @create  2024-05-01
+ * ----------------------------------------------------------------------------------
+ * @licence GPLv3
+ * Use, change and do whatever you like but you have to keep the GPL licence.
+ *  
+ * Hey there, future yacht captain! Just remember, if this module becomes your golden goose, 
+ * don't forget the little Leftfield who helped you hatch it. My beer budget is strictly land-based (for now).
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * ----------------------------------------------------------------------------------
+ *
+ * Go to the SeoTextWidth.js file, edit and change IDs of the two fields for your own need.
+ * My fields are called seo and desc so change just that part: Inputfield_seo and Inputfield_desc
+ */
+
+// Module: SeoTextWidth.module
+
+class SeoTextWidth extends WireData implements Module {
+
+  public static function getModuleInfo() {
+    return [
+      'title' => 'SEO field Text Width module',
+      'summary' => 'This module is calculating width of text in the fields named seo and desc.',
+      'author' => 'Leftfield',
+      'version' => 1,
+	  'autoload' => true
+    ];
+  }
+
+  public function __construct() {
+    parent::__construct();
+  }
+
+  public function init() {
+    $this->addHookAfter('ProcessPageEdit::buildForm', $this, 'addResources');
+  }
+
+  public function addResources(HookEvent $event) {
+	  $page = $event->object;   
+	
+	  $this->config->styles->add($this->config->urls->SeoTextWidth . "SeoTextWidth.css");
+	  $this->config->scripts->add($this->config->urls->SeoTextWidth . "SeoTextWidth.js");
+      
+  
+  }
+}
