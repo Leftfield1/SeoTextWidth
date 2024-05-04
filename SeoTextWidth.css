@@ -1,3 +1,9 @@
+#Inputfield_seo,
+#Inputfield_desc {
+    white-space: nowrap !important;
+    letter-spacing: normal !important;
+}
+
 .text-danger .text-danger {
   color: red;
   font-weight: bold; /* Optional for emphasis */
