@@ -9,10 +9,20 @@ $(document).ready(function() {
 
     // Function to calculate text width
     function calculateTextWidth(text) {
-        // Average character width for Arial 16px
-        const averageCharWidth = 8;
-        return text.length * averageCharWidth;
+      const canvas = calculateTextWidth.canvas || (calculateTextWidth.canvas = document.createElement("canvas"));
+      const context = canvas.getContext("2d");
+
+      const fontWeight = 'normal';
+      const fontSize = '16px';
+      const fontFamily = 'arial, sans-serif';
+
+      context.font = `${fontWeight} ${fontSize} ${fontFamily}`;
+      const metrics = context.measureText(text);
+      const textWidth = metrics.actualBoundingBoxRight + metrics.actualBoundingBoxLeft;
+      return textWidth;
+        
     }
+    
 
     // Function to check and apply class based on width
     function checkTextLength(text, maxLength, fieldName, spanElement) {
