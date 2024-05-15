@@ -1,6 +1,8 @@
 $(document).ready(function() {
-
-    // 512 px for Meta Title - desktop - Inputfield_seo
+    
+    // Source: https://www.screamingfrog.co.uk/page-title-meta-description-lengths-by-pixel-width/
+    // 16px Arial
+    // 512 px for Meta Title - desktop - Inputfield_seo. Latest is 461 px
     // 920 px of Meta Description - desktop - Inputfield_desc
     // Inputfield_seo - this is what you have to change to your own field, so find the ID of the field and change it to Inputfield_seo_title or whatever.
     // Inputfield_desc - this is what you have to change to your own field, so find the ID of the field and change it to Inputfield_seo_description or whatever.
@@ -11,7 +13,7 @@ $(document).ready(function() {
         const context = canvas.getContext("2d");
         // Everyone (Google too) is calculating width 13px.
         const fontWeight = 'normal';
-        const fontSize = '18px';
+        const fontSize = '20px';
         const fontFamily = 'arial, sans-serif';
 
         context.font = `${fontWeight} ${fontSize} ${fontFamily}`;
