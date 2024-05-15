@@ -32,7 +32,7 @@ class SeoTextWidth extends WireData implements Module {
       'title' => 'SEO field Text Width module',
       'summary' => 'This module is calculating width of text in the fields named seo and desc.',
       'author' => 'Leftfield',
-      'version' => 3,
+      'version' => 4,
 	  'autoload' => true
     ];
   }
