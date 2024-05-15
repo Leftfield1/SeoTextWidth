@@ -11,8 +11,8 @@ $(document).ready(function() {
         }
     };
 
-    const seoInput = $('#Inputfield_seo');  
-    const descInput = $('#Inputfield_desc'); 
+    const seoInput = $('#Inputfield_seo');  // You probably need to change this ID
+    const descInput = $('#Inputfield_desc'); // And this one
 
     // Text width calculation (reusable function)
     function calculateTextWidth(text, font) {
