@@ -19,38 +19,94 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * ----------------------------------------------------------------------------------
  *
- * Go to the SeoTextWidth.js file, edit and change IDs of the two fields for your own need.
- * My fields are called seo and desc so change just that part: Inputfield_seo and Inputfield_desc
  */
 
-// Module: SeoTextWidth.module
+class SeoTextWidth extends WireData implements Module, ConfigurableModule {
 
-class SeoTextWidth extends WireData implements Module {
+    public static function getModuleInfo() {
+        return [
+            'title' => 'SEO field Text Width module',
+            'summary' => 'This module calculates the width of text in SEO and description fields.',
+            'author' => 'Leftfield',
+            'version' => 5, // Updated version
+            'autoload' => true
+        ];
+    }
+    
 
-  public static function getModuleInfo() {
-    return [
-      'title' => 'SEO field Text Width module',
-      'summary' => 'This module is calculating width of text in the fields named seo and desc.',
-      'author' => 'Leftfield',
-      'version' => 4,
-	  'autoload' => true
-    ];
-  }
+    public function getModuleConfigInputfields(InputfieldWrapper $inputfields) {
+        $fields = $this->fields->find("type=FieldtypeText|FieldtypeTextarea");
 
-  public function __construct() {
-    parent::__construct();
-  }
+        $options = array('' => 'Select Field');
+        foreach ($fields as $field) {
+            $options[$field->name] = $field->label; 
+        }
 
-  public function init() {
-    $this->addHookAfter('ProcessPageEdit::buildForm', $this, 'addResources');
-  }
+        // SEO Title Field
+        $inputfieldSeo = $this->modules->get('InputfieldSelect');
+        $inputfieldSeo->attr('name', 'seoField');
+        $inputfieldSeo->label = 'SEO Title Field';
+        $inputfieldSeo->description = 'Select the field for SEO title width calculation.';
+        $inputfieldSeo->required = true;
+        $inputfieldSeo->addOptions($options);
+        $inputfields->append($inputfieldSeo);
 
-  public function addResources(HookEvent $event) {
-	  $page = $event->object;   
-	
-	  $this->config->styles->add($this->config->urls->SeoTextWidth . "SeoTextWidth.css");
-	  $this->config->scripts->add($this->config->urls->SeoTextWidth . "SeoTextWidth.js");
-      
-  
-  }
+        // Get saved value (if any)
+        $configData = $this->modules->getModuleConfigData($this);
+        if (!empty($configData['seoField'])) {
+            $inputfieldSeo->value = $configData['seoField']; // Set saved value
+        }
+        $inputfields->append($inputfieldSeo);
+
+        // SEO Description Field
+        $inputfieldDesc = $this->modules->get('InputfieldSelect');
+        $inputfieldDesc->attr('name', 'descField');
+        $inputfieldDesc->label = 'SEO Description Field';
+        $inputfieldDesc->description = 'Select the field for SEO description width calculation.';
+        $inputfieldDesc->required = true;
+        $inputfieldDesc->addOptions($options);
+        $inputfields->append($inputfieldDesc);
+
+        // Get saved value (if any)
+        if (!empty($configData['descField'])) {
+            $inputfieldDesc->value = $configData['descField']; // Set saved value
+        }
+        $inputfields->append($inputfieldDesc);
+
+        return $inputfields;
+    }
+
+    public function init() {
+        $this->addHookAfter('ProcessPageEdit::buildForm', $this, 'addResources');
+    }
+
+    public function ready() {
+        $configData = $this->modules->getModuleConfigData($this);
+
+        if ($configData && isset($configData['seoField'], $configData['descField'])) {
+            $this->config->js('seoField', 'Inputfield_' . $configData['seoField']);
+            $this->config->js('descField', 'Inputfield_' . $configData['descField']);
+        } else {
+            $this->error("SEO Text Width module: Please configure the SEO and Description fields in the module settings.");
+        }
+    }
+    public function addResources(HookEvent $event) {
+        $page = $event->object;
+
+        // Get the configured field names from the module settings
+        $configData = $this->modules->getModuleConfigData($this);
+        $seoFieldName = $configData['seoField'];
+        $descFieldName = $configData['descField'];
+
+        // Get the actual field values from the page
+        $seoFieldValue = $page->get($seoFieldName);
+        $descFieldValue = $page->get($descFieldName);
+
+        // Pass the field values to the JavaScript
+        $this->config->js('seoFieldValue', $seoFieldValue); 
+        $this->config->js('descFieldValue', $descFieldValue);
+
+        $this->config->styles->add($this->config->urls->SeoTextWidth . "SeoTextWidth.css");
+        $this->config->scripts->add($this->config->urls->SeoTextWidth . "SeoTextWidth.js");
+    }
 }
