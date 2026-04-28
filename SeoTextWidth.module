@@ -1,112 +1,175 @@
 <?php namespace ProcessWire;
 
 /**
- * @author  Leftfield
- * @website https://vujosevic.com
- * @create  2024-05-04
- * ----------------------------------------------------------------------------------
- * @licence GPLv3
- * Use, change and do whatever you like but you have to keep the GPL licence.
- *  
- * Hey there, future yacht captain! Just remember, if this module becomes your golden goose, 
- * don't forget the little Leftfield who helped you hatch it. My beer budget is strictly land-based (for now).
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- * ----------------------------------------------------------------------------------
- *
+ * SEO text width helper for ProcessWire page editor fields.
  */
-
 class SeoTextWidth extends WireData implements Module, ConfigurableModule {
+
+    const VERSION = 9;
+
+    protected $defaults = [
+        'seoField' => '',
+        'descField' => '',
+        'titleMinPx' => 200,
+        'titleMaxPx' => 580,
+        'descriptionMinPx' => 400,
+        'descriptionMaxPx' => 920,
+    ];
 
     public static function getModuleInfo() {
         return [
-            'title' => 'SEO field Text Width module',
-            'summary' => 'This module calculates the width of text in SEO and description fields.',
+            'title' => 'SEO Text Width',
+            'summary' => 'Shows SEO title and description pixel-width guidance in the ProcessWire page editor, including multilingual fields.',
             'author' => 'Leftfield',
-            'version' => 5, // Updated version
-            'autoload' => true
+            'href' => 'https://vujosevic.com',
+            'version' => self::VERSION,
+            'autoload' => true,
+            'singular' => true,
+            'icon' => 'text-width',
+            'requires' => 'ProcessWire>=3.0.0',
         ];
-    }
-    
-
-    public function getModuleConfigInputfields(InputfieldWrapper $inputfields) {
-        $fields = $this->fields->find("type=FieldtypeText|FieldtypeTextarea");
-
-        $options = array('' => 'Select Field');
-        foreach ($fields as $field) {
-            $options[$field->name] = $field->label; 
-        }
-
-        // SEO Title Field
-        $inputfieldSeo = $this->modules->get('InputfieldSelect');
-        $inputfieldSeo->attr('name', 'seoField');
-        $inputfieldSeo->label = 'SEO Title Field';
-        $inputfieldSeo->description = 'Select the field for SEO title width calculation.';
-        $inputfieldSeo->required = true;
-        $inputfieldSeo->addOptions($options);
-        $inputfields->append($inputfieldSeo);
-
-        // Get saved value (if any)
-        $configData = $this->modules->getModuleConfigData($this);
-        if (!empty($configData['seoField'])) {
-            $inputfieldSeo->value = $configData['seoField']; // Set saved value
-        }
-        $inputfields->append($inputfieldSeo);
-
-        // SEO Description Field
-        $inputfieldDesc = $this->modules->get('InputfieldSelect');
-        $inputfieldDesc->attr('name', 'descField');
-        $inputfieldDesc->label = 'SEO Description Field';
-        $inputfieldDesc->description = 'Select the field for SEO description width calculation.';
-        $inputfieldDesc->required = true;
-        $inputfieldDesc->addOptions($options);
-        $inputfields->append($inputfieldDesc);
-
-        // Get saved value (if any)
-        if (!empty($configData['descField'])) {
-            $inputfieldDesc->value = $configData['descField']; // Set saved value
-        }
-        $inputfields->append($inputfieldDesc);
-
-        return $inputfields;
     }
 
     public function init() {
         $this->addHookAfter('ProcessPageEdit::buildForm', $this, 'addResources');
     }
 
-    public function ready() {
-        $configData = $this->modules->getModuleConfigData($this);
-
-        if ($configData && isset($configData['seoField'], $configData['descField'])) {
-            $this->config->js('seoField', 'Inputfield_' . $configData['seoField']);
-            $this->config->js('descField', 'Inputfield_' . $configData['descField']);
-        } else {
-            $this->error("SEO Text Width module: Please configure the SEO and Description fields in the module settings.");
+    public function getModuleConfigInputfields($inputfields) {
+        if (!$inputfields instanceof InputfieldWrapper) {
+            $inputfields = new InputfieldWrapper();
         }
+
+        $data = array_merge($this->defaults, (array) $this->wire('modules')->getConfig($this->className(false)));
+        $options = ['' => 'Select field'] + $this->textFieldOptions();
+
+        $seo = $this->wire('modules')->get('InputfieldSelect');
+        $seo->attr('name', 'seoField');
+        $seo->label = 'SEO title field';
+        $seo->description = 'Select the text or textarea field used for the SEO title.';
+        $seo->required = true;
+        $seo->addOptions($options);
+        $seo->value = $data['seoField'];
+        $inputfields->add($seo);
+
+        $desc = $this->wire('modules')->get('InputfieldSelect');
+        $desc->attr('name', 'descField');
+        $desc->label = 'SEO description field';
+        $desc->description = 'Select the text or textarea field used for the SEO meta description.';
+        $desc->required = true;
+        $desc->addOptions($options);
+        $desc->value = $data['descField'];
+        $inputfields->add($desc);
+
+        $this->addIntegerField($inputfields, 'titleMinPx', 'SEO title minimum width, px', $data['titleMinPx'], 0, 50);
+        $this->addIntegerField($inputfields, 'titleMaxPx', 'SEO title maximum width, px', $data['titleMaxPx'], 1, 50);
+        $this->addIntegerField($inputfields, 'descriptionMinPx', 'SEO description minimum width, px', $data['descriptionMinPx'], 0, 50);
+        $this->addIntegerField($inputfields, 'descriptionMaxPx', 'SEO description maximum width, px', $data['descriptionMaxPx'], 1, 50);
+
+        $note = $this->wire('modules')->get('InputfieldMarkup');
+        $note->label = 'How it works';
+        $note->value = '<p>The module measures rendered text width in pixels, not only character count. It adds a status card below every matching language input: <strong>Too short</strong>, <strong>Good length</strong>, or <strong>Too long</strong>.</p>';
+        $inputfields->add($note);
+
+        return $inputfields;
     }
-    public function addResources(HookEvent $event) {
-        $page = $event->object;
 
-        // Get the configured field names from the module settings
-        $configData = $this->modules->getModuleConfigData($this);
-        $seoFieldName = $configData['seoField'];
-        $descFieldName = $configData['descField'];
+    protected function addIntegerField(InputfieldWrapper $inputfields, string $name, string $label, $value, int $min, int $columnWidth): void {
+        $field = $this->wire('modules')->get('InputfieldInteger');
+        $field->attr('name', $name);
+        $field->label = $label;
+        $field->value = (int) $value;
+        $field->min = $min;
+        $field->columnWidth = $columnWidth;
+        $inputfields->add($field);
+    }
 
-        // Get the actual field values from the page
-        $seoFieldValue = $page->get($seoFieldName);
-        $descFieldValue = $page->get($descFieldName);
+    protected function textFieldOptions(): array {
+        $options = [];
+        foreach ($this->wire('fields') as $field) {
+            if (!$field instanceof Field || !$field->id || !$field->type) {
+                continue;
+            }
 
-        // Pass the field values to the JavaScript
-        $this->config->js('seoFieldValue', $seoFieldValue); 
-        $this->config->js('descFieldValue', $descFieldValue);
+            $type = $field->type->className();
+            if (
+                strpos($type, 'FieldtypeText') !== 0 &&
+                strpos($type, 'FieldtypeTextarea') !== 0 &&
+                $type !== 'FieldtypePageTitle' &&
+                $type !== 'FieldtypePageTitleLanguage'
+            ) {
+                continue;
+            }
 
-        $this->config->styles->add($this->config->urls->SeoTextWidth . "SeoTextWidth.css");
-        $this->config->scripts->add($this->config->urls->SeoTextWidth . "SeoTextWidth.js");
+            $label = trim((string) $field->label) ?: $field->name;
+            $options[$field->name] = $label . ' (' . $field->name . ')';
+        }
+
+        ksort($options);
+        return $options;
+    }
+
+    public function addResources(HookEvent $event): void {
+        $data = array_merge($this->defaults, (array) $this->wire('modules')->getConfig($this->className(false)));
+        $seoField = $this->wire('sanitizer')->fieldName((string) $data['seoField']);
+        $descField = $this->wire('sanitizer')->fieldName((string) $data['descField']);
+        $titleRange = $this->widthRange($data['titleMinPx'], $data['titleMaxPx']);
+        $descriptionRange = $this->widthRange($data['descriptionMinPx'], $data['descriptionMaxPx']);
+
+        if ($seoField === '' && $descField === '') {
+            return;
+        }
+
+        $fields = [];
+        if ($seoField !== '') {
+            $fields[] = [
+                'name' => $seoField,
+                'label' => 'SEO title',
+                'kind' => 'title',
+                'minWidth' => $titleRange['min'],
+                'maxWidth' => $titleRange['max'],
+                'font' => ['size' => '20px', 'weight' => '400', 'family' => 'Arial, sans-serif'],
+            ];
+        }
+
+        if ($descField !== '') {
+            $fields[] = [
+                'name' => $descField,
+                'label' => 'SEO description',
+                'kind' => 'description',
+                'minWidth' => $descriptionRange['min'],
+                'maxWidth' => $descriptionRange['max'],
+                'font' => ['size' => '13px', 'weight' => '400', 'family' => 'Arial, sans-serif'],
+            ];
+        }
+
+        $this->wire('config')->js('SeoTextWidth', [
+            'fields' => $fields,
+            'messages' => [
+                'empty' => 'Start typing to measure SEO width.',
+                'tooShort' => 'Too short',
+                'good' => 'Good length',
+                'tooLong' => 'Too long',
+                'pixels' => 'px',
+                'characters' => 'characters',
+                'recommended' => 'Recommended',
+            ],
+        ]);
+
+        $baseUrl = $this->wire('config')->urls->SeoTextWidth;
+        $this->wire('config')->styles->add($baseUrl . 'SeoTextWidth.css?v=' . self::VERSION);
+        $this->wire('config')->scripts->add($baseUrl . 'SeoTextWidth.js?v=' . self::VERSION);
+    }
+
+    protected function widthRange($min, $max): array {
+        $min = max(0, (int) $min);
+        $max = max(1, (int) $max);
+
+        if ($min > $max) {
+            $swap = $min;
+            $min = $max;
+            $max = $swap;
+        }
+
+        return ['min' => $min, 'max' => $max];
     }
 }
