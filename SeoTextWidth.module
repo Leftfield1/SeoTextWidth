@@ -5,7 +5,7 @@
  */
 class SeoTextWidth extends WireData implements Module, ConfigurableModule {
 
-    const VERSION = '9.0.0';
+    const VERSION = '900';
 
     protected $defaults = [
         'seoField' => '',
