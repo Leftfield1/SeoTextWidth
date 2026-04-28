@@ -5,8 +5,6 @@
  */
 class SeoTextWidth extends WireData implements Module, ConfigurableModule {
 
-    const VERSION = '900';
-
     protected $defaults = [
         'seoField' => '',
         'descField' => '',
@@ -19,6 +17,7 @@ class SeoTextWidth extends WireData implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return [
             'title' => 'SEO Text Width',
+            'version' => 900,
             'summary' => 'Shows SEO title and description pixel-width guidance in the ProcessWire page editor, including multilingual fields.',
             'author' => 'Leftfield',
             'href' => 'https://vujosevic.com',
