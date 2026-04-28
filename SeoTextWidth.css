@@ -1,10 +1,111 @@
-#Inputfield_seo,
-#Inputfield_desc {
-    white-space: nowrap !important;
-    letter-spacing: normal !important;
+.seo-text-width-panel {
+  position: relative;
+  overflow: hidden;
+  margin: 10px 0 14px;
+  padding: 14px 16px;
+  border: 1px solid #f1debb;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #fff6df 0%, #fffdf8 52%, #fff1f4 100%);
+  box-shadow: 0 12px 24px rgba(25, 34, 54, 0.08);
 }
 
-.text-danger .text-danger {
-  color: red;
-  font-weight: bold; /* Optional for emphasis */
+.seo-text-width-panel_head,
+.seo-text-width-panel_meter,
+.seo-text-width-panel_meta {
+  position: relative;
+  z-index: 1;
+}
+
+.seo-text-width-panel_head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.seo-text-width-panel_eyebrow {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #a36a00;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seo-text-width-panel_status {
+  color: #2e2e38;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.seo-text-width-panel_meter {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f3e7d2;
+}
+
+.seo-text-width-panel_fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #a36a00;
+  transition: width 0.18s ease, background-color 0.18s ease;
+}
+
+.seo-text-width-panel_meta {
+  margin-top: 8px;
+  color: #5d6475;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.seo-text-width-panel.is-empty .seo-text-width-panel_fill {
+  background: #c9b996;
+}
+
+.seo-text-width-panel.is-short {
+  border-color: #f1debb;
+}
+
+.seo-text-width-panel.is-short .seo-text-width-panel_status {
+  color: #a36a00;
+}
+
+.seo-text-width-panel.is-short .seo-text-width-panel_fill {
+  background: #a36a00;
+}
+
+.seo-text-width-panel.is-good {
+  border-color: rgba(42, 157, 91, 0.28);
+}
+
+.seo-text-width-panel.is-good .seo-text-width-panel_status {
+  color: #1f8a4c;
+}
+
+.seo-text-width-panel.is-good .seo-text-width-panel_fill {
+  background: #1f8a4c;
+}
+
+.seo-text-width-panel.is-long {
+  border-color: rgba(249, 25, 66, 0.28);
+}
+
+.seo-text-width-panel.is-long .seo-text-width-panel_status {
+  color: #f91942;
+}
+
+.seo-text-width-panel.is-long .seo-text-width-panel_fill {
+  background: #f91942;
+}
+
+.seo-text-width-panel.is-long .seo-text-width-panel_eyebrow {
+  color: #8d2032;
 }
