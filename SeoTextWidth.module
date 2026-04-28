@@ -17,7 +17,7 @@ class SeoTextWidth extends WireData implements Module, ConfigurableModule {
     public static function getModuleInfo() {
         return [
             'title' => 'SEO Text Width',
-            'version' => 901,
+            'version' => '9.0.0',
             'summary' => 'Shows SEO title and description pixel-width guidance in the ProcessWire page editor, including multilingual fields.',
             'author' => 'Leftfield',
             'href' => 'https://vujosevic.com',
