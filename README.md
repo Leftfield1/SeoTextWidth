@@ -1,11 +1,28 @@
-Hold onto your hats (and meta descriptions)! This ain't your average snooze-fest README. Buckle up for a wild ride through the world of ProcessWire modules!
+# SEO Text Width
 
-This little gem of a module calculates text width exactly how Google's SERP (fancy talk for Search Engine Results Page) wants it. No more guessing games!  We're also talking meta titles and descriptions, those make-or-break snippets that determine if someone clicks on your website or gets hypnotized by a cat video.
+ProcessWire admin helper for measuring SEO title and meta description length by rendered pixel width.
 
-It calculate the text width in two fields, the fields you choose from dropdown on the configuration page of the module.
+## Features
 
-But wait, there's more! (cue dramatic music) This bad boy comes with a JavaScript file, but don't worry, you're not stuck with it out-of-the-box. It's fully customizable to your whims and desires.  Just remember, with great power comes great responsibility. Don't go changing things willy-nilly and accidentally turn all your website text into emoji speak.
+- Adds live pixel-width guidance below configured SEO title and SEO description fields.
+- Supports regular and multilingual text/textarea fields.
+- Shows English status labels: `Too short`, `Good length`, and `Too long`.
+- Uses configurable minimum and maximum pixel thresholds.
+- Loads only in the ProcessWire page editor.
 
-Now get out there and conquer those SERPs!
+## Default Thresholds
 
-PS: Module is primitive.
+- SEO title: `200-580 px`
+- SEO description: `400-920 px`
+
+These values can be changed in the module settings.
+
+## Configuration
+
+Install the module, then choose:
+
+- SEO title field
+- SEO description field
+- Minimum and maximum width for each field
+
+On multilingual fields, the module attaches to each rendered language input automatically.
